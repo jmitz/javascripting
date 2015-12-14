@@ -5,19 +5,28 @@ module.exports = function(inPort, inFileName){
 		var date = new Date();
 		var urlInfo = url.parse(request.url, true);
 		var returnInfo = {};
+		var data;
 		if (urlInfo.query.iso){
 			date.setTime(Date.parse(urlInfo.query.iso));
 			if (urlInfo.pathname === '/api/parsetime'){
 				returnInfo.hour = date.getHours();
 				returnInfo.minute = date.getMinutes();
 				returnInfo.second = date.getSeconds();
+				data = JSON.stringify(returnInfo);
 			}
 			else if (urlInfo.pathname === '/api/unixtime'){
 				returnInfo.unixtime = date.getTime();
+				data = JSON.stringify(returnInfo);
+
 			}
-			var data = JSON.stringify(returnInfo);
-			response.writeHead(200, {'content-type': 'text/json'});
-			response.end(data);
+			if (data){
+				response.writeHead(200, {'content-type': 'text/json'});
+				response.end(data);
+			}
+			else {
+				response.writeHead(404);
+				response.end();
+			}
 		}
 
 	});
